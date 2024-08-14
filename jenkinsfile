@@ -1,0 +1,32 @@
+pipeline {
+    agent any
+    environment{
+        
+        registryCredential = 'dockerhub'
+        
+       }
+
+    stages {
+        stage('Git Checkout') {
+            steps {
+              git branch: 'main', url: 'https://github.com/ameniboukid/pythonwebapp.git'
+            }
+        }
+         stage('Build Docker Image') {
+            steps {
+                script {
+                    docker.build('my-flask-app')
+                }
+            }
+         }
+         stage('Push to Docker Hub') {
+            steps {
+                script {
+      docker.withRegistry('https://registry.hub.docker.com', registryCredential) {
+                        docker.image('ameniboukid/my-flask-app:latest').push('latest')
+                    }
+    }
+                    }
+                }
+    }
+}
